@@ -25,7 +25,7 @@ int H = 05;
 void setup()
 
 {
-  tone(5, 1000, 30);
+  tone(5, 2000, 300);
   
   pinMode(manualPin, INPUT_PULLUP);
   
@@ -40,19 +40,25 @@ void setup()
   
   lcd.begin(16,2);
   lcd.setCursor(0,0);
-  lcd.print(" Automatic  Pet ");
+  lcd.print("   Tech Club ");
+  lcd.setCursor(0,1);
+  lcd.print("   Production     ");
+  delay(3000);
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("   Smart Pet ");
   lcd.setCursor(0,1);
   lcd.print("     Feeder     ");
-  delay(2000);
+  delay(3000);
   lcd.clear();
-  lcd.print("  Dante B.   ");
-  delay(2000);
+  lcd.print("    Welcome    ");
+  delay(3000);
   lcd.setCursor(0,1);
   lcd.print("  System Ready  ");
-  delay(2000);
+  delay(3000);
   lcd.clear();
   
-  tone(5, 2000, 50);
+  tone(5, 4000, 500);
 
 }
 
@@ -211,41 +217,3 @@ void loop()
  }
  
 }
-
-/* if (Force_VAL < 200) {
-    // Force_VAL is lower than 200, light up RedPin
-    digitalWrite(RedPin, HIGH);
-    digitalWrite(GreenPin, LOW);
-    digitalWrite(BluePin, LOW);
-    blueTurnedOn = false;
-    greenTurnedOn = false;
-  } else if (Force_VAL > 500 && !blueTurnedOn) {
-    // Force_VAL is more than 500, light up BluePin for 2 seconds
-    digitalWrite(RedPin, LOW);
-    digitalWrite(GreenPin, LOW);
-    digitalWrite(BluePin, HIGH);
-    delay(2000);
-
-    // Turn off BluePin
-    digitalWrite(BluePin, LOW);
-    blueTurnedOn = true;
-    greenTurnedOn = false;  // Ensure green is turned off
-  } else if (!greenTurnedOn && Force_VAL > 500 && Force_VAL != lastForce_VAL) {
-    // Force_VAL is between 200 and 500, and green was previously turned off, turn on GreenPin
-    digitalWrite(RedPin, LOW);
-    digitalWrite(GreenPin, HIGH);
-    digitalWrite(BluePin, LOW);
-    greenTurnedOn = true;
-    blueTurnedOn = false;  // Ensure blue is turned off
-  } else {
-    // Force_VAL is between 200 and 500, light up GreenPin
-    digitalWrite(RedPin, LOW);
-    digitalWrite(GreenPin, HIGH);
-    digitalWrite(BluePin, LOW);
-    blueTurnedOn = false;
-  }
-
-  lastForce_VAL = Force_VAL;
-  // Add a delay to prevent rapid changes
-  delay(100);
-  */
