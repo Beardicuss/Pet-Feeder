@@ -1,0 +1,219 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#define RedPin 3
+#define GreenPin 4
+#define BluePin 5
+
+const int in1 = 8;
+const int in2 = 9;
+const int in3 = 10;
+const int in4 = 11;
+const int motorPin = 6;
+const int STEPS_PER_REVOLUTION = 2048;
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+int S = 10;
+int M = 0;
+int H = 0;
+
+int manualPin = 2;
+int waterPin = 12;
+
+int buttonState = 0;
+int waterButtonState = 0;
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(RedPin, OUTPUT);
+  pinMode(GreenPin, OUTPUT);
+  pinMode(BluePin, OUTPUT);
+
+  pinMode(manualPin, INPUT_PULLUP);
+  pinMode(waterPin, INPUT_PULLUP);
+  pinMode(motorPin, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+
+  digitalWrite(RedPin, HIGH);   // Turn on Red LED
+  digitalWrite(GreenPin, LOW);  // Turn off Green LED
+  digitalWrite(BluePin, LOW);
+
+  lcd.init();       // Initialize the LCD
+  lcd.backlight();  // Turn on the backlight
+
+  lcd.setCursor(0, 0);
+  lcd.print(" Tech Club Gori");
+  lcd.setCursor(0, 1);
+  lcd.print("   Production");
+
+  delay(3000);
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("   Smart Pet");
+  delay(1000);
+  lcd.setCursor(0, 1);
+  lcd.print("     Feeder");
+  delay(3000);
+  lcd.clear();
+  lcd.print("    Welcome    ");
+  delay(3000);
+  lcd.setCursor(0, 1);
+  lcd.print("  System Ready  ");
+  delay(3000);
+  digitalWrite(RedPin, LOW);     // Turn off Red LED
+  digitalWrite(GreenPin, HIGH);  // Turn on Green LED
+  digitalWrite(BluePin, LOW);
+  lcd.clear();
+}
+
+void loop() {
+  if (Serial.available()) {
+    lcd.clear();
+    while (Serial.available()) {
+      lcd.write(Serial.read());
+    }
+  }
+
+  lcd.setCursor(0, 0);
+  lcd.print("  Feeding time");
+  lcd.setCursor(6, 1);
+  lcd.print(":");
+  lcd.setCursor(9, 1);
+  lcd.print(":");
+
+  S--;
+  delay(1000);
+
+  if (S < 0) {
+    M--;
+    S = 59;
+  }
+  if (M < 0) {
+    H--;
+    M = 59;
+  }
+  if (H < 0) {
+    H = 02;
+    M = 59;
+    S = 59;
+  }
+  if (M > 9) {
+    lcd.setCursor(7, 1);
+    lcd.print(M);
+  } else {
+    lcd.setCursor(7, 1);
+    lcd.print("0");
+    lcd.setCursor(8, 1);
+    lcd.print(M);
+    lcd.setCursor(9, 1);
+    lcd.print(":");
+  }
+
+  if (S > 9) {
+    lcd.setCursor(10, 1);
+    lcd.print(S);
+  } else {
+    lcd.setCursor(10, 1);
+    lcd.print("0");
+    lcd.setCursor(11, 1);
+    lcd.print(S);
+    lcd.setCursor(12, 1);
+    lcd.print(" ");
+  }
+
+  if (H > 9) {
+    lcd.setCursor(4, 1);
+    lcd.print(H);
+  } else {
+    lcd.setCursor(4, 1);
+    lcd.print("0");
+    lcd.setCursor(5, 1);
+    lcd.print(H);
+    lcd.setCursor(6, 1);
+    lcd.print(":");
+  }
+
+  if ((H == 0) && (M == 0) && (S == 0))  //if countdown comes to 0,
+  {
+    digitalWrite(RedPin, LOW);    // Turn off Red LED
+    digitalWrite(GreenPin, LOW);  // Turn on Green LED
+    digitalWrite(BluePin, HIGH);
+    lcd.setCursor(0, 0);
+    lcd.print("      It's      ");
+    lcd.setCursor(0, 1);
+    lcd.print("Feeding  Time!!!");
+    rotateClockwise(STEPS_PER_REVOLUTION / 2);
+    delay(5000);
+    lcd.clear();
+    digitalWrite(RedPin, LOW);     // Turn off Red LED
+    digitalWrite(GreenPin, HIGH);  // Turn on Green LED
+    digitalWrite(BluePin, LOW);
+  }
+  buttonState = digitalRead(manualPin);
+  if (buttonState == LOW) {
+    digitalWrite(RedPin, LOW);    // Turn off Red LED
+    digitalWrite(GreenPin, LOW);  // Turn on Green LED
+    digitalWrite(BluePin, HIGH);
+    lcd.setCursor(0, 0);
+    lcd.print("    OVERRIDE    ");
+    lcd.setCursor(0, 1);
+    lcd.print("(manual feeding)");
+    rotateClockwise(STEPS_PER_REVOLUTION / 2);
+    delay(5000);
+    lcd.clear();
+    H = 02;
+    M = 59;
+    S = 59;
+    digitalWrite(RedPin, LOW);     // Turn off Red LED
+    digitalWrite(GreenPin, HIGH);  // Turn on Green LED
+    digitalWrite(BluePin, LOW);
+  }
+  waterButtonState = digitalRead(waterPin);
+  if (waterButtonState == LOW) {
+    digitalWrite(RedPin, LOW);    // Turn off Red LED
+    digitalWrite(GreenPin, LOW);  // Turn on Green LED
+    digitalWrite(BluePin, HIGH);
+    lcd.setCursor(0, 0);
+    lcd.print("    WATERING    ");
+    lcd.setCursor(0, 1);
+    lcd.print("Thirst Decreasing");
+    waterPump();
+    lcd.clear();
+    digitalWrite(RedPin, LOW);     // Turn off Red LED
+    digitalWrite(GreenPin, HIGH);  // Turn on Green LED
+    digitalWrite(BluePin, LOW);
+  }
+}
+void waterPump() {
+  digitalWrite(motorPin, HIGH);  // Turn ON the motor
+  delay(5000);                   // Wait for 2 seconds
+  digitalWrite(motorPin, LOW);   // Turn OFF the motor
+}
+void rotateClockwise(int steps) {
+  for (int i = 0; i < steps; i++) {
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, HIGH);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, LOW);
+    delay(2);
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+    delay(2);
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, HIGH);
+    delay(2);
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+    delay(2);
+  }
+}
