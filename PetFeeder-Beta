@@ -181,17 +181,14 @@ void loop() {
     lcd.print("    WATERING    ");
     lcd.setCursor(0, 1);
     lcd.print("Thirst Decreasing");
-    waterPump();
+    digitalWrite(motorPin, HIGH);  // Turn ON the motor
+    delay(5000);                   // Wait for 2 seconds
+    digitalWrite(motorPin, LOW);
     lcd.clear();
     digitalWrite(RedPin, LOW);     // Turn off Red LED
     digitalWrite(GreenPin, HIGH);  // Turn on Green LED
     digitalWrite(BluePin, LOW);
   }
-}
-void waterPump() {
-  digitalWrite(motorPin, HIGH);  // Turn ON the motor
-  delay(5000);                   // Wait for 2 seconds
-  digitalWrite(motorPin, LOW);   // Turn OFF the motor
 }
 void rotateClockwise(int steps) {
   for (int i = 0; i < steps; i++) {
@@ -215,5 +212,9 @@ void rotateClockwise(int steps) {
     digitalWrite(in3, LOW);
     digitalWrite(in4, HIGH);
     delay(2);
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, LOW);
   }
 }
